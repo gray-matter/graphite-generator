@@ -86,7 +86,7 @@ class ConfReader
       graph_multiplexers = graph.fetch("multiplexers", [])
       graph_replacement_scopes = self.build_replacement_scopes(replacements, graph_multiplexers)
 
-      conf_targets = graph.fetch("items", {})
+      conf_targets = graph.fetch("targets", {})
 
       graph_replacement_scopes.each() do |graph_scope|
         merged_scope = graph_scope.merge(dashboard_scope)
