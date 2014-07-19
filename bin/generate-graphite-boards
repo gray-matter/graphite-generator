@@ -1,0 +1,60 @@
+#! /usr/bin/env ruby
+
+$LOAD_PATH.unshift("#{File.dirname(__FILE__)}/../lib")
+
+require 'optparse'
+require 'board-generator'
+
+def graphite_metrics_exists(graphite_server, expression)
+  params = {
+    'format' => 'json',
+    'target' => expression
+  }
+
+  begin
+    response = Net::HTTP.get_response(graphite_server, "/render?#{URI.encode_www_form(params)}")
+  rescue Exception => e
+    return false
+  end
+
+  response_json = JSON.parse(response.body())
+
+  return !response_json.empty?()
+end
+
+options = {}
+options_parser = OptionParser.new() do |opts|
+  opts.banner = "#{File.basename($0)} graphite_server [conf_file..]
+
+Arguments:
+    graphite_server: Hostname (w/o the http part) of the server to which to save Graphite boards.
+    conf_file: Path to configuration files (see README for more information on the expected format).
+
+Options:"
+
+  options[:interactive] = false
+  opts.on('-i', '--interactive', 'Prompt the user before discarding metrics or saving boards') do
+    options[:interactive] = true
+  end
+
+  options[:metrics_checker] = lambda {|_, __| return true}
+  opts.on('-c', '--check-metrics', 'Check that the metrics exist before adding them into a graph') do
+    options[:metrics_checker] = lambda do |graphite_server, metrics|
+      return graphite_metrics_exists(graphite_server, metrics)
+    end
+  end
+end
+
+options_parser.parse!()
+
+if ARGV.size() < 2
+  puts options_parser
+  exit(1)
+end
+
+graphite_server = ARGV.shift()
+bg = BoardGenerator.new(ConfReader.new(), graphite_server)
+
+ARGV.each() do |conf_file_path|
+  bg.generate(conf_file_path, options[:metrics_checker])
+end
