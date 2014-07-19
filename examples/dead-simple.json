@@ -1,0 +1,29 @@
+{
+    "dashboards":
+    [
+	{
+	    "name": "My-First-Dashboard",
+	    "width": 620,
+	    "height": 320,
+	    "graphs":
+	    [
+		{
+		    "title": "Lonely graph",
+		    "targets":
+		    [
+			{
+			    "expression": "my.supa.dupa.expression",
+			    "legend": "Legend",
+			    "color": "red",
+			    "extra_options":
+			    {
+                                "areaMode": "stacked",
+                                "hideLegend": "true"
+                            }
+			}
+		    ]
+		}
+            ]
+	]
+    ]
+}
