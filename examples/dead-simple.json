@@ -12,7 +12,7 @@
 		    "targets":
 		    [
 			{
-			    "expression": "my.supa.dupa.expression",
+			    "expression": "my.supa.expression",
 			    "legend": "Legend",
 			    "color": "red",
 			    "extra_options":

@@ -1,0 +1,73 @@
+{
+    "replacements":
+    {
+        "awesomeness":
+        [
+            {
+                "awesomeness_key": "supa",
+                "awesomeness_legend": "It's supa !"
+            },
+            {
+                "awesomeness_key": "dupa",
+                "awesomeness_legend": "It's dupa !"
+            }
+        ],
+        "awesomeness_precision":
+        [
+            {
+                "awesomeness_precision_key": "uber"
+            },
+            {
+                "awesomeness_precision_key": "fantastic"
+            }
+        ],
+        "country":
+        [
+            {
+                "country_name": "France",
+                "country_graph_height": 200,
+                "country_key": "fr"
+            },
+            {
+                "country_name": "China",
+                "country_graph_height": 300,
+                "country_key": "cn"
+            },
+            {
+                "country_name": "Afghanistan",
+                "country_graph_height": 400,
+                "country_key": "af"
+            }
+        ]
+    },
+    "dashboards":
+    [
+	{
+            "multiplexers": ["country"],
+	    "name": "My-#country_name#-Dashboard",
+	    "width": 620,
+	    "height": "#country_graph_height#",
+	    "graphs":
+	    [
+		{
+                    "multiplexers": ["awesomeness"],
+		    "title": "Graph for #awesomeness_key# in #country_name#",
+		    "targets":
+		    [
+			{
+                            "multiplexers": ["awesomeness_precision"],
+			    "expression": "#country_key#.#awesomeness_key#.#awesomeness_precision_key#",
+			    "legend": "#awesomeness_legend#",
+			    "color": "red",
+			    "extra_options":
+			    {
+                                "areaMode": "stacked",
+                                "hideLegend": "true"
+                            }
+			}
+		    ]
+		}
+            ]
+	}
+    ]
+}

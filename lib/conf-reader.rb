@@ -29,7 +29,7 @@ class ConfReader
     str = original_str.to_s().clone()
 
     replacements.each() do |pattern, replacement|
-      str.gsub!("##{pattern}#", replacement)
+      str.gsub!("##{pattern}#", replacement.to_s())
     end
 
     return str
