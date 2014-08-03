@@ -44,11 +44,6 @@ Options:"
     options[:dry_run] = true
   end
 
-  options[:interactive] = false
-  opts.on('-i', '--interactive', 'Prompt the user before discarding metrics or saving boards') do
-    options[:interactive] = true
-  end
-
   options[:verbosity_level] = 0
   opts.on('-v', 'Display information about the dashboards being created (the more v, the more information !)') do
     options[:verbosity_level] += 1
