@@ -32,16 +32,21 @@ Arguments:
 
 Options:"
 
-  options[:interactive] = false
-  opts.on('-i', '--interactive', 'Prompt the user before discarding metrics or saving boards') do
-    options[:interactive] = true
-  end
-
   options[:metrics_checker] = lambda {|_, __| return true}
   opts.on('-c', '--check-metrics', 'Check that the metrics exist before adding them into a graph') do
     options[:metrics_checker] = lambda do |graphite_server, metrics|
       return graphite_metrics_exists(graphite_server, metrics)
     end
+  end
+
+  options[:interactive] = false
+  opts.on('-i', '--interactive', 'Prompt the user before discarding metrics or saving boards') do
+    options[:interactive] = true
+  end
+
+  options[:verbose] = false
+  opts.on('-v', '--verbose', 'Display extensive information about the dashboards being created') do
+    options[:verbose] = true
   end
 end
 
@@ -53,7 +58,7 @@ if ARGV.size() < 2
 end
 
 graphite_server = ARGV.shift()
-bg = BoardGenerator.new(ConfReader.new(), graphite_server)
+bg = BoardGenerator.new(ConfReader.new(), graphite_server, options[:verbose])
 
 ARGV.each() do |conf_file_path|
   bg.generate(conf_file_path, options[:metrics_checker])
