@@ -35,7 +35,8 @@ class ConfReader
     return str
   end
 
-  def generate_graph_targets(conf_targets, graph_scope, replacements, expression_checker)
+  def generate_graph_targets(conf_targets, graph_scope,
+                             replacements, expression_checker, verbose)
     targets = []
 
     conf_targets.each() do |curve|
@@ -66,7 +67,7 @@ class ConfReader
         if expression_checker.nil?() || expression_checker.call(expression)
           targets << final_expression
         else
-          $stderr.puts(expression + " doesn't seem to work, skipping")
+          puts(expression + " doesn't seem to work, skipping") if verbose
         end
       end
     end
@@ -74,7 +75,8 @@ class ConfReader
     return targets
   end
 
-  def generate_graphs(dashboard_conf, dashboard_scope, replacements, expression_checker)
+  def generate_graphs(dashboard_conf, dashboard_scope,
+                      replacements, expression_checker, verbose)
     dashboard_graphs = []
 
     dashboard_conf.fetch("graphs", {}).each() do |graph|
@@ -98,7 +100,8 @@ class ConfReader
         end
 
         graph_targets = self.generate_graph_targets(conf_targets, merged_scope,
-                                                    replacements, expression_checker)
+                                                    replacements, expression_checker,
+                                                    verbose)
 
         if graph_targets.empty?()
           $stderr.puts("The graph #{title} would be empty, not creating it")
@@ -116,7 +119,7 @@ class ConfReader
   end
 
   public
-  def parse(file_path, expression_checker)
+  def parse(file_path, expression_checker, verbose)
     conf = JSON.parse(IO.read(file_path))
     dashboards = []
     replacements = conf.fetch("replacements", {})
@@ -136,20 +139,21 @@ class ConfReader
         height = self.apply_replacements(raw_height, dashboard_scope)
 
         if dashboard_name.empty?()
-          $stderr.puts "No dashboard name given, skipping"
+          puts "No dashboard name given, skipping" if verbose
           next
         end
 
         if dashboard_names.add?(dashboard_name).nil?()
-          $stderr.puts "Duplicate dashboard name ('#{dashboard_name}'), skipping"
+          puts "Duplicate dashboard name ('#{dashboard_name}'), skipping" if verbose
           next
         end
 
         dashboard_graphs = self.generate_graphs(dashboard_conf, dashboard_scope,
-                                                replacements, expression_checker)
+                                                replacements, expression_checker,
+                                                verbose)
 
         if dashboard_graphs.empty?()
-          $stderr.puts("The dashboard #{dashboard_name} would be empty, not creating it")
+          puts("The dashboard #{dashboard_name} would be empty, not creating it") if verbose
         else
           dashboards << GraphiteDashboardApi::Dashboard.new(dashboard_name) do
             graphs dashboard_graphs

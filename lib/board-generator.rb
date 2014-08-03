@@ -1,10 +1,10 @@
 require 'conf-reader'
 
 class BoardGenerator
-  def initialize(conf_reader, graphite_server, verbose, dry_run)
+  def initialize(conf_reader, graphite_server, verbosity_level, dry_run)
     @conf_reader = conf_reader
     @graphite_server = graphite_server
-    @verbose = verbose
+    @verbosity_level = verbosity_level
     @dry_run = dry_run
   end
 
@@ -13,27 +13,33 @@ class BoardGenerator
       return expression_checker.call(@graphite_server, metrics)
     end
 
-    dashboards = @conf_reader.parse(conf_file_path, graphite_expression_checker)
+    dashboards = @conf_reader.parse(conf_file_path, graphite_expression_checker, @verbosity_level > 1)
     reverse_index = dashboards.size()
     dashboards.each() do |dashboard|
       reverse_index -= 1
 
-      if @verbose
+      if @verbosity_level > 1
         pretty_print_dasboard(dashboard)
       end
 
       if !@dry_run
         begin
           dashboard.save!(@graphite_server)
+
+          if @verbosity_level > 0
+            puts "Successfully created #{self.build_dashboard_url(dashboard.name)}"
+          end
         rescue Exception => e
           $stderr.puts "ERROR: Could not create the dashboard #{dashboard.name} on #@graphite_server: #{e.message}"
         end
       end
 
-      if @verbose
-        puts if reverse_index > 0
-      end
+      puts if @verbosity_level > 1 and reverse_index > 0
     end
+  end
+
+  def build_dashboard_url(dashboard_name)
+    return "http://#@graphite_server/dashboard##{dashboard_name}"
   end
 
   def pretty_print_dasboard(dashboard)

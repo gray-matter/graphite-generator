@@ -49,9 +49,9 @@ Options:"
     options[:interactive] = true
   end
 
-  options[:verbose] = false
-  opts.on('-v', '--verbose', 'Display extensive information about the dashboards being created') do
-    options[:verbose] = true
+  options[:verbosity_level] = 0
+  opts.on('-v', 'Display information about the dashboards being created (the more v, the more information !)') do
+    options[:verbosity_level] += 1
   end
 end
 
@@ -63,7 +63,7 @@ if ARGV.size() < 2
 end
 
 graphite_server = ARGV.shift()
-bg = BoardGenerator.new(ConfReader.new(), graphite_server, options[:verbose], options[:dry_run])
+bg = BoardGenerator.new(ConfReader.new(), graphite_server, options[:verbosity_level], options[:dry_run])
 
 ARGV.each() do |conf_file_path|
   bg.generate(conf_file_path, options[:metrics_checker])
