@@ -1,10 +1,11 @@
 require 'conf-reader'
 
 class BoardGenerator
-  def initialize(conf_reader, graphite_server, verbose)
+  def initialize(conf_reader, graphite_server, verbose, dry_run)
     @conf_reader = conf_reader
     @graphite_server = graphite_server
     @verbose = verbose
+    @dry_run = dry_run
   end
 
   def generate(conf_file_path, expression_checker)
@@ -22,7 +23,9 @@ class BoardGenerator
         puts if reverse_index > 0
       end
 
-      dashboard.save!(@graphite_server)
+      if !@dry_run
+        dashboard.save!(@graphite_server)
+      end
     end
   end
 
