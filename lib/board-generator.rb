@@ -20,11 +20,18 @@ class BoardGenerator
 
       if @verbose
         pretty_print_dasboard(dashboard)
-        puts if reverse_index > 0
       end
 
       if !@dry_run
-        dashboard.save!(@graphite_server)
+        begin
+          dashboard.save!(@graphite_server)
+        rescue Exception => e
+          $stderr.puts "ERROR: Could not create the dashboard #{dashboard.name} on #@graphite_server: #{e.message}"
+        end
+      end
+
+      if @verbose
+        puts if reverse_index > 0
       end
     end
   end
@@ -39,7 +46,7 @@ class BoardGenerator
       graph.targets.each() do |target|
         puts "--- #{target}"
       end
-
+      
       graph.extra_options.each() do |opt_key, opt_value|
         puts "--- #{opt_key}: #{opt_value}"
       end
